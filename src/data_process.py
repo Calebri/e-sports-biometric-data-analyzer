@@ -5,16 +5,30 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+import numpy as np
 
 CHART_OUT = "./charts"
 
-def win_loss_split(df: pd.DataFrame, basis: list[str]) -> pd.DataFrame:
+def win_loss_split(
+        df: pd.DataFrame,
+        basis: str,
+        round: float = 10.0
+    ) -> pd.DataFrame:
     """
     Calculates the per-column win-loss statistics of a given DataFrame.
     Resulting DataFrame includes the following columns: `<basis>, Win, Loss, Win_Prop, Loss_Prop`.
     """
 
-    gdf: pd.DataFrame = df.groupby(basis)["Match_Outcome"].value_counts().unstack()
+    groupby_this: str | pd.Series[float]
+
+    if pd.api.types.is_float_dtype(df[basis]):
+        series: pd.Series = df[basis]
+        bins = np.arange(df[basis].min(), df[basis].max(), round).tolist()
+        groupby_this = pd.cut(series, bins)
+    else:
+        groupby_this = basis
+
+    gdf: pd.DataFrame = df.groupby(groupby_this)["Match_Outcome"].value_counts().unstack()
 
     gdf.reset_index(inplace=True)
 
@@ -28,7 +42,7 @@ def win_loss_split(df: pd.DataFrame, basis: list[str]) -> pd.DataFrame:
 
 def win_loss_chart(
         df: pd.DataFrame,
-        basis: list[str],
+        basis: str,
         plot: list[str],
         save: bool | None = False,
         show: bool | None = False
@@ -46,10 +60,10 @@ def win_loss_chart(
 
     # Plotting Data
     if "win_prop" in plot:
-        df.plot(x=basis[0], y="Win_Prop", kind="bar", ax=ax, label="Win %", color="#0BC60B")
+        df.plot(x=basis, y="Win_Prop", kind="bar", ax=ax, label="Win %", color="#0BC60B")
         ax.axhline(df["Win_Prop"].mean(), color="#0BC60B", linestyle="--", label="Stratified Mean")
     if "loss_prop" in plot:
-        df.plot(x=basis[0], y="Loss_Prop", kind="bar", ax=ax, label="Win %", color="#BB000C")
+        df.plot(x=basis, y="Loss_Prop", kind="bar", ax=ax, label="Win %", color="#BB000C")
         ax.axhline(df["Loss_Prop"].mean(), color="#BB000C", linestyle="--", label="Stratified Mean")
 
     # Axes Params
@@ -66,7 +80,7 @@ def win_loss_chart(
             os.makedirs(CHART_OUT, exist_ok=True)
 
             # Save figure to file.
-            save_path = CHART_OUT + "/" + basis[0] + ".png"
+            save_path = CHART_OUT + "/" + basis + ".png"
             plt.savefig(save_path)
 
             print("Successfully saved chart to: " + save_path)

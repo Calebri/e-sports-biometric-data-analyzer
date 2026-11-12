@@ -10,7 +10,7 @@ def main() -> None:
     df: pd.DataFrame = data_import.get_clean_data(DATA_PATH)
 
 
-    for category in [["Age"], ["Game_Genre"]]:
+    for category in ["Age", "Game_Genre", "Screen_Brightness", "Blue_Light_Filter"]:
         sdf: pd.DataFrame = data_process.win_loss_split(df, category)
         # print(gdf.head())
         # print(gdf.dtypes)
