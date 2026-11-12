@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
@@ -53,12 +55,16 @@ def win_loss_chart(
     ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=0, ha="center") # type: ignore
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
 
-    # Save location
+    # Save file
     if save:
         try:
-            ## FIXME: This crashes when there is no ./data folder!
+            # Make sure CHART_OUT exists.
+            os.makedirs(CHART_OUT, exist_ok=True)
+
+            # Save figure to file.
             save_path = CHART_OUT + "/" + basis[0] + ".png"
             plt.savefig(save_path)
+
             print("Successfully saved chart to: " + save_path)
         except Exception as e:
             print("Failed to save chart: " + str(e))
