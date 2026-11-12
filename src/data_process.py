@@ -47,13 +47,17 @@ def win_loss_chart(
     # Plotting Data
     if "win_prop" in plot:
         df.plot(x=basis[0], y="Win_Prop", kind="bar", ax=ax, label="Win %", color="#0BC60B")
+        ax.axhline(df["Win_Prop"].mean(), color="#0BC60B", linestyle="--", label="Stratified Mean")
     if "loss_prop" in plot:
-        df.plot(x=basis[0], y="Win_Prop", kind="bar", ax=ax, label="Win %", color="#BB000C")
+        df.plot(x=basis[0], y="Loss_Prop", kind="bar", ax=ax, label="Win %", color="#BB000C")
+        ax.axhline(df["Loss_Prop"].mean(), color="#BB000C", linestyle="--", label="Stratified Mean")
 
     # Axes Params
     ax.set_ylim(0, 1)
     ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=0, ha="center") # type: ignore
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
+
+    ax.legend()
 
     # Save file
     if save:
