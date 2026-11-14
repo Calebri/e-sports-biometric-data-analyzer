@@ -49,6 +49,14 @@ There is a `.bat` file included for Windows to easily run the program. Input the
 run.bat
 ```
 
+#### On Linux
+
+There is a `.sh` file included for Linux to easily run the program. Input the following command into a terminal at the project root:
+
+```bash
+run.sh
+```
+
 #### Other Operating Systems
 
 For other operating systems, you must run the python code directly. Run the following in a terminal at the project root:
