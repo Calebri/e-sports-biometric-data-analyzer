@@ -12,10 +12,11 @@ def main() -> None:
 
     for category in ["Age", "Game_Genre", "Screen_Brightness", "Blue_Light_Filter"]:
         sdf: pd.DataFrame = data_process.win_loss_split(df, category)
-        # print(gdf.head())
-        # print(gdf.dtypes)
 
         data_process.win_loss_chart(sdf, category, ["win_prop"], save=True)
+
+    print(data_process.genre_split(df, "Age", "mean").head(10))
+    
 
     print("Operation complete!")
 

@@ -1,6 +1,8 @@
 import os
+from collections.abc import Callable
 
 import pandas as pd
+from pandas.api.typing import SeriesGroupBy
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from matplotlib.figure import Figure
@@ -8,6 +10,7 @@ from matplotlib.axes import Axes
 import numpy as np
 
 CHART_OUT = "./charts"
+
 
 def win_loss_split(
         df: pd.DataFrame,
@@ -92,3 +95,23 @@ def win_loss_chart(
         plt.show(block=True)
 
     return fig, ax
+
+
+def genre_split(
+        df: pd.DataFrame,
+        statcol: str,
+        method: str = "value_counts"
+    ) -> pd.DataFrame:
+    """
+    Groups a DataFrame by "Game_Genre", then calculates a given statistic for a given column.
+    """
+
+    grouped: SeriesGroupBy = df.groupby("Game_Genre")[statcol]
+
+    match method:
+        case "value_counts":
+            return grouped.value_counts().unstack()
+        case "mean":
+            return grouped.mean().to_frame()
+        case _:
+            raise ValueError("Unknown processing method: " + method)
