@@ -1,5 +1,4 @@
 import os
-from collections.abc import Callable
 
 import pandas as pd
 from pandas.api.typing import SeriesGroupBy
