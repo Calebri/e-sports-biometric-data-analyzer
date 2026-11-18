@@ -32,7 +32,9 @@ def win_loss_split(
 
     gdf: pd.DataFrame = df.groupby(groupby_this)["Match_Outcome"].value_counts().unstack()
 
-    gdf.reset_index(inplace=True)
+    gdf = gdf.reset_index()
+
+    gdf = gdf.fillna(0)
 
     age_total: pd.Series = gdf["Win"] + gdf["Loss"]
 

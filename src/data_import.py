@@ -21,7 +21,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     Cleans a given DataFrame, then returns a clean DataFrame.
     """
 
-    df = df.dropna(axis="index", inplace=False)
+    df = df.dropna(axis="index")
     
     return df
 
