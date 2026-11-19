@@ -48,8 +48,8 @@ def win_loss_chart(
         df: pd.DataFrame,
         basis: str,
         plot: list[str],
-        save: bool | None = False,
-        show: bool | None = False
+        save: bool = False,
+        show: bool = False
     ) -> tuple[Figure, Axes]:
     """
     Creates a new figure with MatPlotLib representing a DataFrame from win_loss_split().
@@ -77,23 +77,7 @@ def win_loss_chart(
 
     ax.legend()
 
-    # Save file
-    if save:
-        try:
-            # Make sure CHART_OUT exists.
-            os.makedirs(CHART_OUT, exist_ok=True)
-
-            # Save figure to file.
-            save_path = CHART_OUT + "/" + basis + ".png"
-            plt.savefig(save_path)
-
-            print("Successfully saved chart to: " + save_path)
-        except Exception as e:
-            print("Failed to save chart: " + str(e))
-
-    # Halt thread and show
-    if show:
-        plt.show(block=True)
+    plot_out(fig, (basis.lower() + "_win_loss") if save else None, show)
 
     return fig, ax
 
@@ -116,3 +100,67 @@ def genre_split(
             return grouped.mean().to_frame()
         case _:
             raise ValueError("Unknown processing method: " + method)
+
+
+def genre_chart(
+        df: pd.DataFrame,
+        statistic: str,
+        save: bool = False,
+        show: bool = False
+    ) -> tuple[Figure, Axes]:
+    
+    statcol: str = df.columns[0]
+    statcol_display: str = statcol.replace("_", " ").title()
+
+    # Stats
+    mean: float = df[statcol].mean()
+    std: float = df[statcol].std()
+    margin: float = std * 3
+    
+    fig, ax = plt.subplots()
+
+    df.plot(kind="bar", ax=ax, label=statcol_display)
+
+    ax.set_ylim(mean - margin, mean + margin)
+    ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=0, ha="center") # type: ignore
+    ax.set_title(statistic.title() + " " + statcol_display + " by Game Genre")
+    ax.set_xlabel(statcol_display)
+
+    ax.axhline(mean, color="blue", linestyle="-", label="Mean")
+    ax.axhline(mean - std, color="yellow", linestyle="--", label="Standard Deviation")
+    ax.axhline(mean + std, color="yellow", linestyle="--")
+
+    ax.legend()
+
+    plot_out(fig, (statcol.lower() + "_by_genre") if save else None, show)
+
+    return fig, ax
+
+
+def plot_out(
+        fig: Figure,
+        savename: str | None = None,
+        show: bool = False
+    ) -> None:
+    """
+    Handles saving and showing plots. Pass a savename to save the plot to a file.
+    Pass show=True to show the graph on the screen.
+    """
+
+    # Save file
+    if savename != None:
+        try:
+            # Make sure CHART_OUT exists.
+            os.makedirs(CHART_OUT, exist_ok=True)
+
+            # Save figure to file.
+            save_path = CHART_OUT + "/" + savename + ".png"
+            fig.savefig(save_path)
+
+            print("Successfully saved chart to: " + save_path)
+        except Exception as e:
+            print("Failed to save chart: " + str(e))
+
+    # Halt thread and show
+    if show:
+        plt.show(block=True)
