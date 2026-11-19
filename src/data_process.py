@@ -57,7 +57,7 @@ def win_loss_chart(
     Options are available for showing this plot immediately or saving it to a file.
     """
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(layout="constrained")
 
     # 50% line
     ax.axhline(0.5, color="yellow", linestyle="--", label="50%")
@@ -72,7 +72,7 @@ def win_loss_chart(
 
     # Axes Params
     ax.set_ylim(0, 1)
-    ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=0, ha="center") # type: ignore
+    ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=270, ha="center") # type: ignore
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
 
     ax.legend()
