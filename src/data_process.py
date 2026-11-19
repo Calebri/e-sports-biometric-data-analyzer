@@ -21,15 +21,18 @@ def win_loss_split(
     Resulting DataFrame includes the following columns: `<basis>, Win, Loss, Win_Prop, Loss_Prop`.
     """
 
-    groupby_this: str | pd.Series[float]
+    groupby_this: str | pd.Series
 
-    if pd.api.types.is_float_dtype(df[basis]):
+    # Use alternative grouping algorithm for float columns, or integer columns with many unique values.
+    if pd.api.types.is_float_dtype(df[basis])\
+        or (pd.api.types.is_integer_dtype(df[basis]) and df.shape[0] > 10):
+        # Cut value-space into 10 columns. Similar to histogram.
         series: pd.Series = df[basis]
-        bins = np.arange(df[basis].min(), df[basis].max(), round).tolist()
-        groupby_this = pd.cut(series, bins)
+        groupby_this = pd.cut(series, 10)
     else:
+        # Default grouping for objects or small-count integers
         groupby_this = basis
-
+    
     gdf: pd.DataFrame = df.groupby(groupby_this)["Match_Outcome"].value_counts().unstack()
 
     gdf = gdf.reset_index()
