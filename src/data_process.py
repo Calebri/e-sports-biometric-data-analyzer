@@ -10,15 +10,13 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
-import numpy as np
 
 CHART_OUT = "./charts"
 
 
 def win_loss_split(
         df: pd.DataFrame,
-        basis: str,
-        round: float = 10.0
+        basis: str
     ) -> pd.DataFrame:
     """
     Calculates the per-column win-loss statistics of a given DataFrame.
