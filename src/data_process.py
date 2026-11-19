@@ -143,7 +143,7 @@ def genre_chart(
     df.plot(kind="bar", color="purple", ax=ax, label=statcol_display)
 
     # Chart Parameters and Labels
-    ax.set_ylim(mean - margin, mean + margin)
+    ax.set_ylim(max(mean - margin, 0), mean + margin)
     ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=0, ha="center") # type: ignore
     ax.set_title(statistic.title() + " " + statcol_display + " by Game Genre")
     ax.set_xlabel(statcol_display)
