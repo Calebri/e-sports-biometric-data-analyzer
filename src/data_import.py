@@ -1,3 +1,7 @@
+"""
+Submodule for importing and preprocessing raw .csv data.
+"""
+
 import sys
 
 import pandas as pd
@@ -21,6 +25,7 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     Cleans a given DataFrame, then returns a clean DataFrame.
     """
 
+    # Drop rows with missing data.
     df = df.dropna(axis="index")
     
     return df

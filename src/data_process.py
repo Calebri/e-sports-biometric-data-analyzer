@@ -1,3 +1,7 @@
+"""
+Submodule for processing DataFrames into statistics and producing charts.
+"""
+
 import os
 
 import pandas as pd
@@ -21,6 +25,7 @@ def win_loss_split(
     Resulting DataFrame includes the following columns: `<basis>, Win, Loss, Win_Prop, Loss_Prop`.
     """
 
+    # Container for the grouping basis.
     groupby_this: str | pd.Series
 
     # Use alternative grouping algorithm for float columns, or integer columns with many unique values.
@@ -30,17 +35,22 @@ def win_loss_split(
         series: pd.Series = df[basis]
         groupby_this = pd.cut(series, 10)
     else:
-        # Default grouping for objects or small-count integers
+        # Default grouping for objects or small-count integers.
         groupby_this = basis
-    
+
+    # Grouped Data Frame.
     gdf: pd.DataFrame = df.groupby(groupby_this)["Match_Outcome"].value_counts().unstack()
 
+    # Turn groups into indexed rows.
     gdf = gdf.reset_index()
 
+    # 0-count entires calculate to N/A. We replace them with 0.
     gdf = gdf.fillna(0)
 
+    # Total count series used for calculating proportional w/l columns.
     age_total: pd.Series = gdf["Win"] + gdf["Loss"]
 
+    # Calculate proportional wins and losses for easier comparison.
     gdf["Win_Prop"] = gdf["Win"] / age_total
     gdf["Loss_Prop"] = gdf["Loss"] / age_total
 
@@ -60,6 +70,7 @@ def win_loss_chart(
     Options are available for showing this plot immediately or saving it to a file.
     """
 
+    # Plot init
     fig, ax = plt.subplots(layout="constrained")
 
     # 50% line
@@ -78,8 +89,10 @@ def win_loss_chart(
     ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=270, ha="center") # type: ignore
     ax.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1.0))
 
+    # Display legend
     ax.legend()
 
+    # Save or show plot
     plot_out(fig, (basis.lower() + "_win_loss") if save else None, show)
 
     return fig, ax
@@ -94,8 +107,10 @@ def genre_split(
     Groups a DataFrame by "Game_Genre", then calculates a given statistic for a given column.
     """
 
+    # Group statcol by Game_Genre.
     grouped: SeriesGroupBy = df.groupby("Game_Genre")[statcol]
 
+    # Calculate statistic based on passed parameter. Return value must be a DataFrame.
     match method:
         case "value_counts":
             return grouped.value_counts().unstack()
@@ -111,30 +126,39 @@ def genre_chart(
         save: bool = False,
         show: bool = False
     ) -> tuple[Figure, Axes]:
-    
+
+    # Retrieve statcol.
     statcol: str = df.columns[0]
+
+    # This is used where statcol needs to appear on the chart.
     statcol_display: str = statcol.replace("_", " ").title()
 
-    # Stats
+    # Statistic Calculation
     mean: float = df[statcol].mean()
     std: float = df[statcol].std()
     margin: float = std * 3
-    
+
+    # Figure init
     fig, ax = plt.subplots()
 
-    df.plot(kind="bar", ax=ax, label=statcol_display)
+    # Plot Bars
+    df.plot(kind="bar", color="purple", ax=ax, label=statcol_display)
 
+    # Chart Parameters and Labels
     ax.set_ylim(mean - margin, mean + margin)
     ax.set_xticks(ax.get_xticks(), ax.get_xticklabels(), rotation=0, ha="center") # type: ignore
     ax.set_title(statistic.title() + " " + statcol_display + " by Game Genre")
     ax.set_xlabel(statcol_display)
 
+    # Horizontal Lines for Mean and StDev
     ax.axhline(mean, color="blue", linestyle="-", label="Mean")
     ax.axhline(mean - std, color="yellow", linestyle="--", label="Standard Deviation")
     ax.axhline(mean + std, color="yellow", linestyle="--")
 
+    # Init legend.
     ax.legend()
 
+    # Save/Show plot.
     plot_out(fig, (statcol.lower() + "_by_genre") if save else None, show)
 
     return fig, ax

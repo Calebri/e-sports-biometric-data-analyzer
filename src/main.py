@@ -1,13 +1,20 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Submodules
 import data_import
 import data_process
 
+# Path to the raw data .csv file.
 DATA_PATH = "./data/esports_gaming_biometrics_250k.csv"
 
 
 def process_win_loss(df: pd.DataFrame) -> None:
+    """
+    Macro function that processes win/loss charts using submodules.
+    """
+
+    # List of categories to process.
     PROC_CATEGORIES: list = [
         "Age",
         "Game_Genre",
@@ -27,6 +34,11 @@ def process_win_loss(df: pd.DataFrame) -> None:
 
 
 def process_genre(df: pd.DataFrame) -> None:
+    """
+    Macro function that processes genre-grouped charts using submodules.
+    """
+
+    # List of categories to process.
     PROC_CATEGORIES: list[str] = [
         "Age",
         "PlayTime_Hours",
@@ -47,6 +59,10 @@ def process_genre(df: pd.DataFrame) -> None:
 
 
 def main() -> None:
+    """
+    Main method. Call submodules to process data, then exit.
+    """
+
     df: pd.DataFrame = data_import.get_clean_data(DATA_PATH)
 
     process_win_loss(df)
